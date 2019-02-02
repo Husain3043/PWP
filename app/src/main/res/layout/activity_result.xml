@@ -20,11 +20,23 @@
     />
 
     <Button
-        android:id="@+id/backit"
+        android:id="@+id/back"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-        android:text="BACK"
+        android:text="RETRY"
+        android:textSize="25dp"
+        android:layout_marginLeft="120dp"
+        android:background="@color/colorAccent"
+        android:textColor="#fff"
+        />
+
+    <Button
+        android:id="@+id/valid"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="RETRY"
         android:textSize="25dp"
         android:layout_marginLeft="120dp"
         android:background="@color/colorAccent"

@@ -1,6 +1,8 @@
 package com.example.user.plaspcik;
 
 import android.content.Intent;
+import com.example.user.plaspcik.TrueTime;
+import com.example.user.plaspcik.TrueTimeRx;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
@@ -58,11 +60,15 @@ import java.util.Map;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.observers.DisposableSingleObserver;
+import io.reactivex.schedulers.Schedulers;
+
 public class Upload extends AppCompatActivity  {
 
     GoogleSignInClient mGoogleSignInClient;
     ImageView mimageView;
-    public String time;
+    String time;
     String Email;
     private String UploadUrl = "http://192.168.0.100/News/Upload.php";
     Button button2;
@@ -167,7 +173,7 @@ public class Upload extends AppCompatActivity  {
             if (selectedImage != null) {
                 if (selectedImage.toString().startsWith("file:")) {
 
-                    File Kumel = new File(selectedImage.getPath());
+                    File DKNY = new File(selectedImage.getPath());
 
                     InputStream in = null;
                     try {
@@ -233,6 +239,11 @@ public class Upload extends AppCompatActivity  {
 
     public void uploadImage(View view) {
         countDownTimer.cancel();
+        //initRxTrueTime();
+        //if (time == "NO"){
+          //  return;
+        //}
+
         textView.setVisibility(View.INVISIBLE);
         Toast.makeText(getApplicationContext(), "Upload Success!", Toast.LENGTH_SHORT).show();
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -302,6 +313,8 @@ public class Upload extends AppCompatActivity  {
 
                     Intent intent2 = new Intent(Upload.this,Result.class);
                         intent2.putExtra("pred",s);
+                        intent2.putExtra("time",time);
+                        intent2.putExtra("email",Email);
                         startActivity(intent2);
 
 
@@ -343,6 +356,32 @@ public class Upload extends AppCompatActivity  {
 
     }
 
+    private void initRxTrueTime() {
+        DisposableSingleObserver<Date> disposable = TrueTimeRx.build()
+                .withConnectionTimeout(31_428)
+                .withRetryCount(100)
+                .withSharedPreferencesCache(this)
+                .withLoggingEnabled(true)
+                .initializeRx("time.google.com")
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(new DisposableSingleObserver<Date>() {
+                    @Override
+                    public void onSuccess(Date date) {
+                        //Log.d(TAG, "Success initialized TrueTime :" + date.toString());
+                        Toast.makeText(Upload.this, "Success TrueTime :" +date.toString(), Toast.LENGTH_SHORT).show();
+                        time = date.toString();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Toast.makeText(Upload.this, "Failed TrueTime ", Toast.LENGTH_SHORT).show();
+                        time = "NO";
+
+                        //Log.e(TAG, "something went wrong when trying to initializeRx TrueTime", e);
+                    }
+                });
+    }
 
 
 }
